@@ -1,0 +1,35 @@
+---
+title : "Insert Title Here"
+author: "Morde Bernstein, Marley McGehee, Kimberly McNeil"
+date: "5/01/2026"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      error = TRUE, 
+                      message = TRUE)
+library(tidyverse)
+library(knitr)
+
+```
+
+
+## Introduction
+
+Our first dataset is focused on adult asthma prevalence by state in 2020. We obtained this dataset from the CDC website at the [2020 Archived State or Territory Asthma Data](https://www.cdc.gov/asthma/archivedata/2020/2020_archived_states_territory.html) page.
+
+
+Our second dataset is focused on air pollution. We obtained this dataset from the
+
+## Data Import
+
+## Exploratory Data Analysis
+
+## Research
+
+## Conclusion
+
+
