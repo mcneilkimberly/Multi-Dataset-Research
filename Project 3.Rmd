@@ -19,9 +19,9 @@ library(knitr)
 
 ## Introduction
 
-Our first dataset is focused on adult asthma prevalence by state in 2020. We obtained this dataset from the CDC website at the [2020 Archived State or Territory Asthma Data](https://www.cdc.gov/asthma/archivedata/2020/2020_archived_states_territory.html) page. The data has a sample size of 50 and includes both numbers with current asthma and percent with current asthma variables. 
+Our first dataset is focused on adult asthma prevalence by state in 2020. We obtained this dataset from the CDC website at the [2020 Archived State or Territory Asthma Data](https://www.cdc.gov/asthma/archivedata/2020/2020_archived_states_territory.html) page. The data has a sample size of 52, the 50 states and 2 territories of Guam and Puerto Rico, and includes both numbers with current asthma and percent with current asthma variables. 
 
-Our second dataset is about air pollution particulate matter by state, also in 2020. We obtained this data from the National Institute on Minority Health and Health Disparities at the [Physical Environment - Air Pollution] (https://hdpulse.nimhd.nih.gov/data-portal/physical/table?age=001&age_options=ageall_1&demo=234&demo_options=air_pollution_1&physicaltopic=002&physicaltopic_options=physical_2&race=00&race_options=raceall_1&sex=0&sex_options=sexboth_1&statefips=00&statefips_options=area_states) page. The sample size is 50, and the data includes air particulates in micrograms per cubic meter (PM2.5). This is a measure of air pollution which looks at the average number of particulates in the air daily.
+Our second dataset is about air pollution particulate matter by state, also in 2020. We obtained this data from the National Institute on Minority Health and Health Disparities at the [Physical Environment - Air Pollution] (https://hdpulse.nimhd.nih.gov/data-portal/physical/table?age=001&age_options=ageall_1&demo=234&demo_options=air_pollution_1&physicaltopic=002&physicaltopic_options=physical_2&race=00&race_options=raceall_1&sex=0&sex_options=sexboth_1&statefips=00&statefips_options=area_states) page. The sample size is 53, and the data includes air particulates in micrograms per cubic meter (PM2.5). This is a measure of air pollution which looks at the average number of particulates in the air daily.
 
 ## Data Import
 
@@ -37,7 +37,8 @@ asthma <- asthma %>%
   rename(
     state = state_or_territory,
     asthma_number = number_with_current_asthma,
-    asthma_percent = percent_with_current_asthma_se)
+    asthma_percent = percent_with_current_asthma_se) %>%
+   mutate(asthma_percent = parse_number(asthma_percent))
 
 # Dataset 2 Import
 
@@ -47,21 +48,59 @@ pollution <- read_csv("HDPulse_data_export (1).csv",
 # Initialize cleaning the column names (and giving names to the unnamed)
 pollution <- janitor::clean_names(pollution) 
 
+
 # Make the janitor's work clearer
 pollution <- pollution %>%
-  rename(
-    state = state,
+  rename(state = state,
     fips = fips,
     pollution = micrograms_per_cubic_meter_pm2_5_1)
+
 
 ```
 
 ```{r}
 asthma_air <- asthma %>% left_join(pollution, join_by(state)) %>%
   relocate(fips, .after = state)
+
 ```
 
 ## Exploratory Data Analysis
+
+### Percent with Current Asthma
+
+```{r}
+asthma_air %>%
+  summarize(
+      Mean = mean(asthma_percent, na.rm = TRUE),
+      Median = median(asthma_percent, na.rm = TRUE),
+      sd = sd(asthma_percent, na.rm = TRUE),
+      Min = min(asthma_percent, na.rm = TRUE),
+      Q1 = quantile(asthma_percent, 0.25, na.rm = TRUE),
+      Q3 = quantile(asthma_percent, 0.75, na.rm = TRUE),
+      Max = max(asthma_percent, na.rm = TRUE)
+  ) %>% 
+  kable(caption = "Percent of Population with Current Asthma Across States")
+```
+
+```{r}
+highest_asthma_air <- asthma_air %>%
+  select(state, asthma_percent) %>%
+  arrange(desc(asthma_percent)) 
+
+knitr::kable(highest_asthma_air %>%
+               head(n = 5),
+               caption = "States with Highest Asthma Percentage")
+```
+
+```{r}
+lowest_asthma_air <- asthma_air %>%
+  select(state, asthma_percent) %>%
+  arrange(asthma_percent) 
+
+knitr::kable(lowest_asthma_air %>%
+               head(n = 5),
+               caption ="States with Lowest Asthma Percentage")
+```
 
 ## Research
 
