@@ -36,8 +36,8 @@ asthma <- janitor::clean_names(asthma)
 asthma <- asthma %>%
   rename(
     state = state_or_territory,
-    number = number_with_current_asthma,
-    percent = percent_with_current_asthma_se)
+    asthma_number = number_with_current_asthma,
+    asthma_percent = percent_with_current_asthma_se)
 
 # Dataset 2 Import
 
@@ -56,6 +56,10 @@ pollution <- pollution %>%
 
 ```
 
+```{r}
+asthma_air <- asthma %>% left_join(pollution, join_by(state)) %>%
+  relocate(fips, .after = state)
+```
 
 ## Exploratory Data Analysis
 
