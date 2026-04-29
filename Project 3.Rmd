@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = TRUE)
 library(tidyverse)
 library(knitr)
-
+library(maps)
 ```
 
 
@@ -21,7 +21,7 @@ library(knitr)
 
 Our first dataset is focused on adult asthma prevalence by state in 2020. We obtained this dataset from the CDC website at the [2020 Archived State or Territory Asthma Data](https://www.cdc.gov/asthma/archivedata/2020/2020_archived_states_territory.html) page. The data has a sample size of 52, the 50 states and 2 territories of Guam and Puerto Rico, and includes both numbers with current asthma and percent with current asthma variables. 
 
-Our second dataset is about air pollution particulate matter by state, also in 2020. We obtained this data from the National Institute on Minority Health and Health Disparities at the [Physical Environment - Air Pollution] (https://hdpulse.nimhd.nih.gov/data-portal/physical/table?age=001&age_options=ageall_1&demo=234&demo_options=air_pollution_1&physicaltopic=002&physicaltopic_options=physical_2&race=00&race_options=raceall_1&sex=0&sex_options=sexboth_1&statefips=00&statefips_options=area_states) page. The sample size is 53, and the data includes air particulates in micrograms per cubic meter (PM2.5). This is a measure of air pollution which looks at the average number of particulates in the air daily.
+Our second dataset is about air pollution particulate matter by state, also in 2020. We obtained this data from the National Institute on Minority Health and Health Disparities at the [Physical Environment - Air Pollution](https://hdpulse.nimhd.nih.gov/data-portal/physical/table?age=001&age_options=ageall_1&demo=234&demo_options=air_pollution_1&physicaltopic=002&physicaltopic_options=physical_2&race=00&race_options=raceall_1&sex=0&sex_options=sexboth_1&statefips=00&statefips_options=area_states) page. The sample size is 53, and the data includes air particulates in micrograms per cubic meter (PM2.5). This is a measure of air pollution which looks at the average number of particulates in the air daily.
 
 ## Data Import
 
@@ -102,7 +102,42 @@ knitr::kable(lowest_asthma_air %>%
                caption ="States with Lowest Asthma Percentage")
 ```
 
+
+### Air Pollution
+
+```{r}
+asthma_air %>%
+  summarize(
+      Mean = mean(pollution, na.rm = TRUE),
+      Median = median(pollution, na.rm = TRUE),
+      sd = sd(pollution, na.rm = TRUE),
+      Min = min(pollution, na.rm = TRUE),
+      Q1 = quantile(pollution, 0.25, na.rm = TRUE),
+      Q3 = quantile(pollution, 0.75, na.rm = TRUE),
+      Max = max(pollution, na.rm = TRUE)
+  ) %>% 
+  kable(caption = "Air Pollution Across States (in micrograms per cubic meter)")
+```
+
+```{r}
+asthma_air_level <- asthma_air %>%
+  mutate (
+    pollution_level = cut(pollution, c(-Inf, 5, 9, Inf), c("Low (WHO)", "Low (US)", "High"))
+  ) %>%
+  count(pollution_level) 
+
+
+knitr::kable(asthma_air_level,
+               caption = "States Divided by Air Pollution Levels")
+```
+
+The table above shows a count of air pollution broken apart into different categories based on the parts per milligram. The WHO organization standard for healthy air quality levels is under 5 parts per milligram, while the US standard is under 9 parts per milligram [(Air Quality Standards)](https://www.iqair.com/us/newsroom/new-epa-annual-pm25-air-quality-standards-expected-save-lives). The two NA's account for Puerto Rico and Gaum. 
+
+
+
 ## Research
+
+
 
 ## Conclusion
 
