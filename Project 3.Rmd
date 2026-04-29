@@ -102,6 +102,16 @@ knitr::kable(lowest_asthma_air %>%
                caption ="States with Lowest Asthma Percentage")
 ```
 
+```{r}
+asthma_air %>% 
+  ggplot(aes(x = asthma_percent)) +
+    geom_histogram(bins = 15,
+                   fill = "blue",
+                   color = "black") +
+    labs(title = "Distribution of Percent with Current Asthma (Histogram)",
+         x = "Percent Asthma",
+         y = "Count")
+```
 
 ### Air Pollution
 
@@ -138,6 +148,16 @@ knitr::kable(highest_pollution %>%
                head(n = 5),
                caption ="States with Highest Pollution")
 ```
+```{r}
+asthma_air %>% 
+  ggplot(aes(x = pollution)) +
+    geom_histogram(bins = 20,
+                   fill = "blue",
+                   color = "black") +
+    labs(title = "Distribution of Air Pollution (Histogram)",
+         x = "Air Pollution",
+         y = "Count")
+```
 
 ```{r}
 asthma_air_level <- asthma_air %>%
@@ -145,7 +165,6 @@ asthma_air_level <- asthma_air %>%
     pollution_level = cut(pollution, c(-Inf, 5, 9, Inf), c("Low (WHO)", "Low (US)", "High"))
   ) %>%
   count(pollution_level) 
-
 
 knitr::kable(asthma_air_level,
                caption = "States Divided by Air Pollution Levels")
