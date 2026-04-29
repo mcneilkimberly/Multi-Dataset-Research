@@ -120,6 +120,26 @@ asthma_air %>%
 ```
 
 ```{r}
+lowest_pollution <- asthma_air %>%
+  select(state, pollution) %>%
+  arrange(pollution) 
+
+knitr::kable(lowest_pollution %>%
+               head(n = 5),
+               caption ="States with Lowest Pollution")
+```
+
+```{r}
+highest_pollution <- asthma_air %>%
+  select(state, pollution) %>%
+  arrange(desc(pollution)) 
+
+knitr::kable(highest_pollution %>%
+               head(n = 5),
+               caption ="States with Highest Pollution")
+```
+
+```{r}
 asthma_air_level <- asthma_air %>%
   mutate (
     pollution_level = cut(pollution, c(-Inf, 5, 9, Inf), c("Low (WHO)", "Low (US)", "High"))
