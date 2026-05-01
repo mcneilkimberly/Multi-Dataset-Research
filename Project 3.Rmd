@@ -27,7 +27,7 @@ Our second dataset is about air pollution particulate matter by state, also in 2
 
 ```{r}
 # Dataset 1 Import
-asthma <- read_csv("asthma_prevalence - Sheet1.csv")
+asthma <- read_csv("asthma_prevalence - Sheet1.csv",show_col_types = FALSE)
 
 # Initialize cleaning the column names (and giving names to the unnamed)
 asthma <- janitor::clean_names(asthma) 
@@ -43,7 +43,7 @@ asthma <- asthma %>%
 # Dataset 2 Import
 
 pollution <- read_csv("HDPulse_data_export (1).csv", 
-    skip = 5)
+    skip = 5,show_col_types = FALSE)
 
 # Initialize cleaning the column names (and giving names to the unnamed)
 pollution <- janitor::clean_names(pollution) 
@@ -54,9 +54,11 @@ pollution <- pollution %>%
   rename(state = state,
     fips = fips,
     pollution = micrograms_per_cubic_meter_pm2_5_1)
-
-
 ```
+
+
+Both of our datasets were CSVs, so we used read_csv() to open them. For the air pollution particulate matter, the file included a header that would have messed with making the table, so we skipped those lines. We also included show_col_types = FALSE in order to hide a non-urgent error message. Then, we first ran the names through janitor's clean_names function, and afterwards renamed them ourselves for clarity as well as to turn asthma_percent's category into a number in order to perform operations on it.
+
 
 ```{r}
 asthma_air <- asthma %>% left_join(pollution, join_by(state)) %>%
