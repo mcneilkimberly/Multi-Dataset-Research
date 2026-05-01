@@ -1,5 +1,5 @@
 ---
-title : "Insert Title Here"
+title : "Air Quality and Asthma in the United States: A State-Level Analysis"
 author: "Morde Bernstein, Marley McGehee, Kimberly McNeil"
 date: "5/01/2026"
 output:
@@ -56,17 +56,19 @@ pollution <- pollution %>%
     pollution = micrograms_per_cubic_meter_pm2_5_1)
 ```
 
-
-Both of our datasets were CSVs, so we used read_csv() to open them. For the air pollution particulate matter, the file included a header that would have messed with making the table, so we skipped those lines. We also included show_col_types = FALSE in order to hide a non-urgent error message. Then, we first ran the names through janitor's clean_names function, and afterwards renamed them ourselves for clarity as well as to turn asthma_percent's category into a number in order to perform operations on it.
-
-
 ```{r}
+# Join our datasets by state
 asthma_air <- asthma %>% left_join(pollution, join_by(state)) %>%
   relocate(fips, .after = state)
-
 ```
 
+Both of our datasets were CSVs, so we used read_csv() to open them. For the air pollution particulate matter, we skipped the first five rows because they contained metadata rather than observations. We also included show_col_types = FALSE in order to hide a non-urgent error message. Then, We standardized column names using janitor::clean_names(), then renamed the variables for clarity. Next, we turned asthma_percent's category into a number in order to prepare it for numerical operations. We then joined our two datasets based on states, as that was the common feature between them.
+
 ## Exploratory Data Analysis
+
+### Key Variable Discusion
+
+The key variable connecting both datasets is the state name. There are 50 listed U.S. states and the two terretories Puerto Rico and Guam. Minor inconsistencies (such as the pollution data also having the United States as a whole) resulted in missing values after joining. This is fine because we are looking at the states and terretories individually, not as a whole.
 
 ### Percent with Current Asthma
 
@@ -153,8 +155,8 @@ knitr::kable(highest_pollution %>%
                caption ="States with Highest Pollution")
 ```
 
-
 The two tables above illustrate that the highest air pollution is in California and the lowest air pollution is in Hawaii. 
+
 ```{r}
 asthma_air %>% 
   ggplot(aes(x = pollution)) +
@@ -177,8 +179,24 @@ knitr::kable(asthma_air_level,
                caption = "States Divided by Air Pollution Levels")
 ```
 
-The table above shows a count of air pollution broken apart into different categories based on the parts per milligram. The WHO organization standard for healthy air quality levels is under 5 parts per milligram, while the US standard is under 9 parts per milligram [(Air Quality Standards)](https://www.iqair.com/us/newsroom/new-epa-annual-pm25-air-quality-standards-expected-save-lives). The two NA's account for Puerto Rico and Gaum. 
+The table above shows a count of air pollution broken apart into different categories based on the micrograms per cubic meter. The WHO standard for healthy air quality levels is under 5 parts per milligram, while the US standard is under 9 parts per milligram [(Air Quality Standards)](https://www.iqair.com/us/newsroom/new-epa-annual-pm25-air-quality-standards-expected-save-lives). The two NA's account for Puerto Rico and Guam. 
 
+### Relationship Analysis
+
+```{r}
+ggplot(asthma_air, aes(x = pollution, y = asthma_percent)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  labs(
+    title = "Relationship Between Air Pollution and Asthma Prevalence",
+    x = "PM2.5 (Air Pollution)",
+    y = "Asthma (%)"
+  )
+```
+
+```{r}
+cor(asthma_air$pollution, asthma_air$asthma_percent, use = "complete.obs")
+```
 
 
 ## Research
