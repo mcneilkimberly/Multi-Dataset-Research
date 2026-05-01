@@ -62,13 +62,28 @@ asthma_air <- asthma %>% left_join(pollution, join_by(state)) %>%
   relocate(fips, .after = state)
 ```
 
-Both of our datasets were CSVs, so we used read_csv() to open them. For the air pollution particulate matter, we skipped the first five rows because they contained metadata rather than observations. We also included show_col_types = FALSE in order to hide a non-urgent error message. Then, We standardized column names using janitor::clean_names(), then renamed the variables for clarity. Next, we turned asthma_percent's category into a number in order to prepare it for numerical operations. We then joined our two datasets based on states, as that was the common feature between them.
+Both of our datasets were CSVs, so we used read_csv() to open them. For the air pollution particulate matter, we skipped the first five rows because they contained metadata rather than observations. We also included show_col_types = FALSE in order to hide a non-urgent error message. Then, We standardized column names using janitor::clean_names(), then renamed the variables for clarity. Next, we turned asthma_percent's category into a number in order to prepare it for numerical operations. 
+
+We then joined our two datasets based on states, as that was the common feature between them. After joining the datasets by state, pollution data was missing for Puerto Rico and Guam. Puerto Rico had a recorded value of NA in the pollution dataset, while Guam was not included in the pollution dataset at all. These resulted in missing values in the merged dataset. Additionally, the pollution dataset included a national-level observation ("United States"), which was excluded during merging since the asthma dataset only contains state-level observations.
+
+The following table explicitly showcases the missing pollution data: 
+```{r}
+asthma_air %>%
+  filter(is.na(pollution)) %>%
+  select(state, asthma_percent) %>% 
+  kable(caption = "Territories and their asthma_percents that are Missing from our Merged Dataset")
+```
+
 
 ## Exploratory Data Analysis
 
-### Key Variable Discusion
+### Primary Key Variable Discusion
 
-The key variable connecting both datasets is the state name. There are 50 listed U.S. states and the two terretories Puerto Rico and Guam. Minor inconsistencies (such as the pollution data also having the United States as a whole) resulted in missing values after joining. This is fine because we are looking at the states and terretories individually, not as a whole.
+The primary key used to merge the datasets is the state (or territory) name. Both datasets include all 50 U.S. states and Washington, D.C., while the asthma dataset also includes the territories of Puerto Rico and Guam. 
+
+Some inconsistencies were present between the datasets. For example, the pollution dataset includes an observation for the United States as a whole, which does not have a corresponding entry in the asthma dataset and was thus excluded during the join. Additionally, pollution data for Puerto Rico and Guam were unavailable, leading to missing values for these locations in the merged dataset.
+
+These issues do not significantly impact the analysis, as the focus of this project is on state-level comparisons rather than a national collection.
 
 ### Percent with Current Asthma
 
@@ -81,7 +96,8 @@ asthma_air %>%
       Min = min(asthma_percent, na.rm = TRUE),
       Q1 = quantile(asthma_percent, 0.25, na.rm = TRUE),
       Q3 = quantile(asthma_percent, 0.75, na.rm = TRUE),
-      Max = max(asthma_percent, na.rm = TRUE)
+      Max = max(asthma_percent, na.rm = TRUE),
+      n = sum(!is.na(asthma_percent))
   ) %>% 
   kable(caption = "Percent of Population with Current Asthma Across States")
 ```
@@ -128,8 +144,8 @@ asthma_air %>%
       Min = min(pollution, na.rm = TRUE),
       Q1 = quantile(pollution, 0.25, na.rm = TRUE),
       Q3 = quantile(pollution, 0.75, na.rm = TRUE),
-      Max = max(pollution, na.rm = TRUE)
-  ) %>% 
+      Max = max(pollution, na.rm = TRUE),
+      n = sum(!is.na(pollution))  ) %>% 
   kable(caption = "Air Pollution Across States (in micrograms per cubic meter)")
 ```
 
@@ -179,9 +195,11 @@ knitr::kable(asthma_air_level,
                caption = "States Divided by Air Pollution Levels")
 ```
 
-The table above shows a count of air pollution broken apart into different categories based on the micrograms per cubic meter. The WHO standard for healthy air quality levels is under 5 parts per milligram, while the US standard is under 9 parts per milligram [(Air Quality Standards)](https://www.iqair.com/us/newsroom/new-epa-annual-pm25-air-quality-standards-expected-save-lives). The two NA's account for Puerto Rico and Guam. 
+The table above shows a count of air pollution broken apart into different categories based on the micrograms per cubic meter. The WHO standard for healthy air quality levels is under 5 parts per milligram, while the US standard is under 9 parts per milligram [(Air Quality Standards)](https://www.iqair.com/us/newsroom/new-epa-annual-pm25-air-quality-standards-expected-save-lives). The two missing values correspond to Puerto Rico and Guam, which do not have available PM2.5 data in the pollution dataset. 
 
 ### Relationship Analysis
+
+Now, let's see how our variables plot against each other with our independent variable being pollution and our dependent variable being asthma prevalence. The following scatterplot and correlation coefficient will be analyzed in this report's Research section:
 
 ```{r}
 ggplot(asthma_air, aes(x = pollution, y = asthma_percent)) +
@@ -197,11 +215,49 @@ ggplot(asthma_air, aes(x = pollution, y = asthma_percent)) +
 ```{r}
 cor(asthma_air$pollution, asthma_air$asthma_percent, use = "complete.obs")
 ```
+#### Regression Model
 
+We can also create a regression model to see if we can predict asthma prevalence using pollution. The following is our summary that we will analyze in the Research section:
+
+```{r}
+model <- lm(asthma_percent ~ pollution, data = asthma_air)
+summary(model)
+```
 
 ## Research
 
+### Research Question
 
+How does air pollution (PM2.5 levels) relate to asthma prevalence across U.S. states?
+
+### Apprach
+
+To investigate this, we merged the asthma and pollution datasets by state and created a scatterplot to visualize the relationship. We also calculated the correlation coefficient to quantify the strength of the association, and we created a regression model to  try and predict asthma prevalence using pollution. Puerto Rico and Guam were excluded from the analysis when calculating summary statistics, relationships, and the model, as pollution data for these locations was unavailable.
+
+### Results and Interpretation
+
+#### Scatterplot and Correlation
+
+The scatterplot shows a no relationship between pollution and asthma. A common way to tell if there is no relationship is if the correlation coefficient's absolute value is between 0.0 and 0.2. Our coefficient has an absolute value of 0.066, falling within the "no relationship" interval
+
+Because there is no relationship, we can infer that air pollution alone does not explain differences in asthma prevalence across states. Other factors (healthcare access, smoking, urbanization, environmental differences) may also play a role and may be stronger than air pollution.
+
+#### Regression Model
+
+To further examine the relationship between air pollution and asthma prevalence, we fitted a linear regression model with asthma percentage as the response variable and PM2.5 levels as the predictor.
+
+The model found a very small negative relationship between pollution and asthma prevalence (with slope = -0.046), suggesting that higher pollution is associated with a very slight decrease in asthma rates. However, this relationship was not statistically significant (p = 0.644), indicating that there is no meaningful evidence of an association between the two variables.
+
+Additionally, the model's R^2 value was around 0.004, showing us that air pollution explains less than 1% of the variation in asthma prevalence across states. This tells us that that other factors (like the ones mentioned with the scatterplot) likely play a much larger role.
+
+Again, note that two observations (Puerto Rico and Guam) were excluded from the model due to missing pollution data.
+
+### Limitations
+
+The following is a list of some limitations of this analysis:
+- Our data is from one year only: 2020.
+- State-level averages hide local variation.
+- There is the absence of pollution data for Puerto Rico and Guam, which slightly reduces the completeness of the dataset.
 
 
 ## Conclusion
