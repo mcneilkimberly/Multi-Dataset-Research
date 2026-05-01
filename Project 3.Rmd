@@ -129,6 +129,8 @@ asthma_air %>%
   kable(caption = "Air Pollution Across States (in micrograms per cubic meter)")
 ```
 
+From the above table, we can see that there is an average air pollution across all 50 states of 7.24. There is a range of air pollution values from 3.7 to 12.6. 
+
 ```{r}
 lowest_pollution <- asthma_air %>%
   select(state, pollution) %>%
@@ -148,6 +150,9 @@ knitr::kable(highest_pollution %>%
                head(n = 5),
                caption ="States with Highest Pollution")
 ```
+
+
+The two tables above illustrate that the highest air pollution is in California and the lowest air pollution is in Hawaii. 
 ```{r}
 asthma_air %>% 
   ggplot(aes(x = pollution)) +
@@ -175,6 +180,7 @@ The table above shows a count of air pollution broken apart into different categ
 
 
 ## Research
+
 
 
 
