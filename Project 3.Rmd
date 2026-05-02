@@ -102,6 +102,8 @@ asthma_air %>%
   kable(caption = "Percent of Population with Current Asthma Across States")
 ```
 
+The average percent of people with current asthma across states is 9.56%. There is a range in asthma percentages from 5% to 12.4%.
+
 ```{r}
 highest_asthma_air <- asthma_air %>%
   select(state, asthma_percent) %>%
@@ -111,6 +113,8 @@ knitr::kable(highest_asthma_air %>%
                head(n = 5),
                caption = "States with Highest Asthma Percentage")
 ```
+
+
 
 ```{r}
 lowest_asthma_air <- asthma_air %>%
@@ -132,6 +136,10 @@ asthma_air %>%
          x = "Percent Asthma",
          y = "Count")
 ```
+
+
+The lowest percentage of asthma overall is in Guam with 5.0%, however for a continental state the lowest percentage is Florida with 7.3%. The highest percent is in West Virginia with 12.4%. From the histogram above we can see that a large amount of state's asthma percentages fall around 9% to just under 11%. There are few states that fall under 8% and above 11%.
+
 
 ### Air Pollution
 
