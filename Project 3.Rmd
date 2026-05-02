@@ -9,11 +9,10 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, 
-                      error = TRUE, 
-                      message = TRUE)
+                      error = FALSE, 
+                      message = FALSE)
 library(tidyverse)
 library(knitr)
-library(maps)
 ```
 
 
