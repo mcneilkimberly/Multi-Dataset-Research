@@ -55,13 +55,17 @@ pollution <- pollution %>%
     pollution = micrograms_per_cubic_meter_pm2_5_1)
 ```
 
+
+Both of our datasets were CSV files, so we used read_csv() to open them. For the air pollution particulate matter, we skipped the first five rows because they contained metadata rather than observations. Then, we standardized column names using janitor::clean_names(), then renamed the variables for clarity. Next, we turned asthma_percent's category into a number in order to prepare it for numerical operations.
+
+
 ```{r}
 # Join our datasets by state
 asthma_air <- asthma %>% left_join(pollution, join_by(state)) %>%
   relocate(fips, .after = state)
 ```
 
-Both of our datasets were CSVs, so we used read_csv() to open them. For the air pollution particulate matter, we skipped the first five rows because they contained metadata rather than observations. We also included show_col_types = FALSE in order to hide a non-urgent error message. Then, We standardized column names using janitor::clean_names(), then renamed the variables for clarity. Next, we turned asthma_percent's category into a number in order to prepare it for numerical operations. 
+ 
 
 We then joined our two datasets based on states, as that was the common feature between them. After joining the datasets by state, pollution data was missing for Puerto Rico and Guam. Puerto Rico had a recorded value of NA in the pollution dataset, while Guam was not included in the pollution dataset at all. These resulted in missing values in the merged dataset. Additionally, the pollution dataset included a national-level observation ("United States"), which was excluded during merging since the asthma dataset only contains state-level observations.
 
@@ -156,7 +160,7 @@ asthma_air %>%
   kable(caption = "Air Pollution Across States (in micrograms per cubic meter)")
 ```
 
-From the above table, we can see that there is an average air pollution across all 50 states of 7.24. There is a range of air pollution values from 3.7 to 12.6. 
+From the above table, we can see that there is an average air pollution across all 50 states of 7.24 micrograms per cubic meter. There is a range of air pollution values from 3.7 to 12.6 micrograms per cubic meter. 
 
 ```{r}
 lowest_pollution <- asthma_air %>%
@@ -237,7 +241,7 @@ summary(model)
 
 How does air pollution (PM2.5 levels) relate to asthma prevalence across U.S. states?
 
-### Apprach
+### Approach
 
 To investigate this, we merged the asthma and pollution datasets by state and created a scatterplot to visualize the relationship. We also calculated the correlation coefficient to quantify the strength of the association, and we created a regression model to  try and predict asthma prevalence using pollution. Puerto Rico and Guam were excluded from the analysis when calculating summary statistics, relationships, and the model, as pollution data for these locations was unavailable.
 
@@ -245,7 +249,7 @@ To investigate this, we merged the asthma and pollution datasets by state and cr
 
 #### Scatterplot and Correlation
 
-The scatterplot shows a no relationship between pollution and asthma. A common way to tell if there is no relationship is if the correlation coefficient's absolute value is between 0.0 and 0.2. Our coefficient has an absolute value of 0.066, falling within the "no relationship" interval
+The scatterplot shows no relationship between pollution and asthma. A common way to tell if there is no relationship is if the correlation coefficient's absolute value is between 0.0 and 0.2. Our coefficient has an absolute value of 0.066, falling within the "no relationship" interval.
 
 Because there is no relationship, we can infer that air pollution alone does not explain differences in asthma prevalence across states. Other factors (healthcare access, smoking, urbanization, environmental differences) may also play a role and may be stronger than air pollution.
 
@@ -269,4 +273,6 @@ The following is a list of some limitations of this analysis:
 
 ## Conclusion
 
+Through univariate and bivariate analysis, we found that there were differences in air pollution levels and asthma levels across states. After looking at both a scatter plot with correlation value and linear regression we found that there was no statistically significant correlation between air pollution and asthma percentages across states.
 
+One limitation to this research is that the data was taken during 2020, during the time of the COVID-19 pandemic, which could potentially cause an increase in asthma. Additionally, the asthma dataset is on adult prevalence. It could be interesting to see if children are more susceptible, as well as if air pollution could increase the severity of asthma symptoms. 
