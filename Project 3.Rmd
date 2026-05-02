@@ -18,7 +18,7 @@ library(knitr)
 
 ## Introduction
 
-Our first dataset is focused on adult asthma prevalence by state in 2020. We obtained this dataset from the CDC website at the [2020 Archived State or Territory Asthma Data](https://www.cdc.gov/asthma/archivedata/2020/2020_archived_states_territory.html) page. The data has a sample size of 53, including the 50 states, Washington D.C., and 2 territories (Guam and Puerto Rico), and includes both numbers with current asthma and percent with current asthma variables. 
+Our first dataset is focused on adult asthma prevalence by state in 2020. We obtained this dataset from the CDC website at the [2020 Archived State or Territory Asthma Data](https://www.cdc.gov/asthma/archivedata/2020/2020_archived_states_territory.html) page. The data has a sample size of 53, including the 50 states, D.C., and 2 territories (Guam and Puerto Rico), and includes both numbers with current asthma and percent with current asthma variables. 
 
 Our second dataset is about air pollution particulate matter by state, also in 2020. We obtained this data from the National Institute on Minority Health and Health Disparities at the [Physical Environment - Air Pollution](https://hdpulse.nimhd.nih.gov/data-portal/physical/table?age=001&age_options=ageall_1&demo=234&demo_options=air_pollution_1&physicaltopic=002&physicaltopic_options=physical_2&race=00&race_options=raceall_1&sex=0&sex_options=sexboth_1&statefips=00&statefips_options=area_states) page. The sample size is 52 (all 50 states, D.C., and the U.S as a whole, not including Puerto Rico for being listed as NA and Guam for being missing entirely), and the data includes air particulates in micrograms per cubic meter (PM2.5). This is a measure of air pollution which looks at the average number of particulates in the air daily.
 
@@ -56,7 +56,7 @@ pollution <- pollution %>%
 ```
 
 
-Both of our datasets were CSV files, so we used read_csv() to open them. For the air pollution particulate matter, we skipped the first five rows because they contained metadata rather than observations. Then, we standardized column names using janitor::clean_names(), then renamed the variables for clarity. Next, we turned asthma_percent's category into a number in order to prepare it for numerical operations.
+Both of our datasets were CSV files, so we used read_csv() to open them. For the air pollution particulate matter, we skipped the first five rows because they contained metadata rather than observations. Then, we standardized column names using janitor::clean_names(), then renamed the variables for clarity. Next, we converted the asthma_percent variable to a numeric format in order to prepare it for numerical operations.
 
 
 ```{r}
@@ -67,26 +67,26 @@ asthma_air <- asthma %>% left_join(pollution, join_by(state)) %>%
 
  
 
-We then joined our two datasets based on states, as that was the common feature between them. After joining the datasets by state, pollution data was missing for Puerto Rico and Guam. Puerto Rico had a recorded value of NA in the pollution dataset, while Guam was not included in the pollution dataset at all. These resulted in missing values in the merged dataset. Additionally, the pollution dataset included a national-level observation ("United States"), which was excluded during merging since the asthma dataset only contains state-level observations.
+We then joined our two datasets based on states, as that was the common feature between them. After joining the datasets by state, pollution data was missing for Puerto Rico and Guam. Puerto Rico had a recorded value of NA in the pollution dataset, while Guam was not included in the pollution dataset at all. This resulted in missing values in the merged dataset. Additionally, the pollution dataset included a national-level observation ("United States"), which was excluded during merging since the asthma dataset only contains state-level observations.
 
 The following table explicitly showcases the missing pollution data: 
 ```{r}
 asthma_air %>%
   filter(is.na(pollution)) %>%
   select(state, asthma_percent) %>% 
-  kable(caption = "Territories and their asthma_percents that are Missing from our Merged Dataset")
+  kable(caption = "Territories and their Asthma Percentages that are Missing from our Merged Dataset")
 ```
 
 
 ## Exploratory Data Analysis
 
-### Primary Key Variable Discusion
+### Primary Key Variable Discussion
 
-The primary key used to merge the datasets is the state (or territory) name. Both datasets include all 50 U.S. states and Washington, D.C., while the asthma dataset also includes the territories of Puerto Rico and Guam. 
+The primary key used to merge the datasets is the state (or territory) name. Both datasets include all 50 U.S. states and D.C., while the asthma dataset also includes the territories of Puerto Rico and Guam. 
 
 Some inconsistencies were present between the datasets. For example, the pollution dataset includes an observation for the United States as a whole, which does not have a corresponding entry in the asthma dataset and was thus excluded during the join. Additionally, pollution data for Puerto Rico and Guam were unavailable, leading to missing values for these locations in the merged dataset.
 
-These issues do not significantly impact the analysis, as the focus of this project is on state-level comparisons rather than a national collection.
+These issues do not significantly affect the analysis, as the focus of this project is on state-level comparisons rather than a national collection.
 
 ### Percent with Current Asthma
 
@@ -141,7 +141,7 @@ asthma_air %>%
 ```
 
 
-The lowest percentage of asthma overall is in Guam with 5.0%, however for a continental state the lowest percentage is Florida with 7.3%. The highest percent is in West Virginia with 12.4%. From the histogram above we can see that a large amount of state's asthma percentages fall around 9% to just under 11%. There are few states that fall under 8% and above 11%.
+The lowest percentage of asthma overall is in Guam with 5.0%, however for a continental state the lowest percentage is Florida with 7.3%. The highest percent is in West Virginia with 12.4%. From the histogram above, the results show that a large number of states' asthma percentages fall around 9% to just under 11%. Few states fall below 8% or above 11%..
 
 
 ### Air Pollution
@@ -160,7 +160,7 @@ asthma_air %>%
   kable(caption = "Air Pollution Across States (in micrograms per cubic meter)")
 ```
 
-From the above table, we can see that there is an average air pollution across all 50 states of 7.24 micrograms per cubic meter. There is a range of air pollution values from 3.7 to 12.6 micrograms per cubic meter. 
+From the above table, the results show that there is an average air pollution across all 50 states of 7.24 micrograms per cubic meter. There is a range of air pollution values from 3.7 to 12.6 micrograms per cubic meter. 
 
 ```{r}
 lowest_pollution <- asthma_air %>%
@@ -206,11 +206,11 @@ knitr::kable(asthma_air_level,
                caption = "States Divided by Air Pollution Levels")
 ```
 
-The table above shows a count of air pollution broken apart into different categories based on the micrograms per cubic meter. The WHO standard for healthy air quality levels is under 5 parts per milligram, while the US standard is under 9 parts per milligram [(Air Quality Standards)](https://www.iqair.com/us/newsroom/new-epa-annual-pm25-air-quality-standards-expected-save-lives). The two missing values correspond to Puerto Rico and Guam, which do not have available PM2.5 data in the pollution dataset. 
+The table above shows a count of air pollution broken apart into different categories based on the micrograms per cubic meter. The WHO standard for healthy air quality levels is under 5 micrograms per cubic meter, while the US standard is under 9 micrograms per cubic meter [(Air Quality Standards)](https://www.iqair.com/us/newsroom/new-epa-annual-pm25-air-quality-standards-expected-save-lives). The two missing values correspond to Puerto Rico and Guam, which do not have available PM2.5 data in the pollution dataset. 
 
 ### Relationship Analysis
 
-Now, let's see how our variables plot against each other with our independent variable being pollution and our dependent variable being asthma prevalence. The following scatterplot and correlation coefficient will be analyzed in this report's Research section:
+We now examine the relationship between the variables, with our independent variable being pollution and our dependent variable being asthma prevalence. The following scatterplot and correlation coefficient will be analyzed in the Research section:
 
 ```{r}
 ggplot(asthma_air, aes(x = pollution, y = asthma_percent)) +
@@ -243,13 +243,13 @@ How does air pollution (PM2.5 levels) relate to asthma prevalence across U.S. st
 
 ### Approach
 
-To investigate this, we merged the asthma and pollution datasets by state and created a scatterplot to visualize the relationship. We also calculated the correlation coefficient to quantify the strength of the association, and we created a regression model to  try and predict asthma prevalence using pollution. Puerto Rico and Guam were excluded from the analysis when calculating summary statistics, relationships, and the model, as pollution data for these locations was unavailable.
+To investigate this, we merged the asthma and pollution datasets by state and created a scatterplot to visualize the relationship. We also calculated the correlation coefficient to quantify the strength of the association, and we created a regression model to  attempt to predict asthma prevalence using pollution. Puerto Rico and Guam were excluded from the analysis when calculating summary statistics, relationships, and the model, as pollution data for these locations was unavailable.
 
 ### Results and Interpretation
 
 #### Scatterplot and Correlation
 
-The scatterplot shows no relationship between pollution and asthma. A common way to tell if there is no relationship is if the correlation coefficient's absolute value is between 0.0 and 0.2. Our coefficient has an absolute value of 0.066, falling within the "no relationship" interval.
+The scatterplot indicates no relationship between pollution and asthma. It shows points widely dispersed with no clear upward or downward trend, further supporting the lack of a relationship. A common way to tell if there is a very weak or negligible relationship is if the correlation coefficient's absolute value is between 0.0 and 0.2. Our  correlation coefficient is 0.066, indicating a very weak (essentially negligible) linear relationship between air pollution and asthma prevalence
 
 Because there is no relationship, we can infer that air pollution alone does not explain differences in asthma prevalence across states. Other factors (healthcare access, smoking, urbanization, environmental differences) may also play a role and may be stronger than air pollution.
 
@@ -259,20 +259,19 @@ To further examine the relationship between air pollution and asthma prevalence,
 
 The model found a very small negative relationship between pollution and asthma prevalence (with slope = -0.046), suggesting that higher pollution is associated with a very slight decrease in asthma rates. However, this relationship was not statistically significant (p = 0.644), indicating that there is no meaningful evidence of an association between the two variables.
 
-Additionally, the model's R^2 value was around 0.004, showing us that air pollution explains less than 1% of the variation in asthma prevalence across states. This tells us that that other factors (like the ones mentioned with the scatterplot) likely play a much larger role.
+Additionally, the model's R^2 value was around 0.004, indicating that air pollution explains less than 1% of the variation in asthma prevalence across states. This tells us that other factors (like the ones mentioned with the scatterplot) likely play a much larger role.
 
 Again, note that two observations (Puerto Rico and Guam) were excluded from the model due to missing pollution data.
 
 ### Limitations
 
-The following is a list of some limitations of this analysis:
-- Our data is from one year only: 2020.
-- State-level averages hide local variation.
-- There is the absence of pollution data for Puerto Rico and Guam, which slightly reduces the completeness of the dataset.
+Some limitations of this analysis include the following: the data are from a single year (2020); state-level averages may hide local variation; pollution data are unavailable for Puerto Rico and Guam, slightly reducing the completeness of the dataset; and potential differences in data collection methods between sources may introduce inconsistencies.
 
 
 ## Conclusion
 
-Through univariate and bivariate analysis, we found that there were differences in air pollution levels and asthma levels across states. After looking at both a scatter plot with correlation value and linear regression we found that there was no statistically significant correlation between air pollution and asthma percentages across states.
+This analysis examined whether air pollution (PM2.5) is associated with asthma prevalence across U.S. states. Through univariate and bivariate analysis, we found that there were differences in air pollution levels and asthma levels across states; however, both the correlation coefficient and regression model suggest that air pollution does not significantly explain differences in asthma prevalence at the state level.
 
-One limitation to this research is that the data was taken during 2020, during the time of the COVID-19 pandemic, which could potentially cause an increase in asthma. Additionally, the asthma dataset is on adult prevalence. It could be interesting to see if children are more susceptible, as well as if air pollution could increase the severity of asthma symptoms. 
+These findings suggest that asthma prevalence is likely influenced more strongly by other factors, such as healthcare access, socioeconomic conditions, or localized environmental exposures. Additionally, the use of state-level averages may obscure smaller-scale relationships that exist within states.
+
+One limitation to this research is that the data was taken during a single year (2020), which may not reflect longer-term trends, especially given the unusual conditions during the COVID-19 pandemic. Future research could explore multi-year data or more localized datasets to better understand the relationship between air quality and asthma. Additionally, the asthma dataset is on adult prevalence. It could be interesting to see if children are more susceptible, as well as if air pollution could increase the severity of asthma symptoms. 
